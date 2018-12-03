@@ -118,7 +118,8 @@ public class GestorPartidas {
 	 */
 	public String getBarco(int idBarco) {
 		//pedimos respuesta de barco
-		Response response = cliente.target(baseURI).path(""+idBarco).request(MediaType.TEXT_PLAIN).get();
+		String target = targetPartida.getUri().toString();
+		Response response = cliente.target(target).path(""+idBarco).request().get();
 		//compruebo que exista y gestiono el error en caso de que haya
 		if(response.getStatus()==404) {
 			response.close();

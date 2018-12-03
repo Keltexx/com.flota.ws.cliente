@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import javax.swing.*;
 
-
-
 public class ClienteFlotaWS {
 
 	// Sustituye esta clase por tu implementación.
@@ -46,7 +44,7 @@ public class ClienteFlotaWS {
 	private void ejecuta() {
 		// Instancia la primera partida
 		try {
-			aux = new GestorPartidas("localhost", "8080");
+			aux = new GestorPartidas();
 			aux.nuevaPartida(NUMFILAS, NUMCOLUMNAS, NUMBARCOS);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -177,20 +175,16 @@ public class ClienteFlotaWS {
 		/**
 		 * Muestra la solucion de la partida y marca la partida como finalizada
 		 */
-		public void muestraSolucion() {
+		public void muestraSolucion() throws IOException {
 			quedan=0;
 			for (int i = 0; i < numFilas; i++) {
 				for (int j = 0; j < numColumnas; j++){
 					int toque;
-					try {
-						toque = aux.pruebaCasilla(i, j);
-						if(toque==-1) {
-							guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.cyan);
-						}else {
-							guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.magenta);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
+					toque = aux.pruebaCasilla(i, j);
+					if(toque==-1) {
+						guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.cyan);
+					}else {
+						guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.magenta);
 					}
 				}
 			}
@@ -275,7 +269,12 @@ public class ClienteFlotaWS {
 				guiTablero.liberaRecursos();
 				break;
 			case "Mostrar solucion":
-				guiTablero.muestraSolucion();
+				try {
+					guiTablero.muestraSolucion();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				
 				break;
 			case "Nueva partida":
@@ -314,24 +313,20 @@ public class ClienteFlotaWS {
 				if(!guiTablero.buttons[i][j].getBackground().equals(Color.yellow) &&
 						!guiTablero.buttons[i][j].getBackground().equals(Color.red)){
 					int toque;
-					try {
-						toque = aux.pruebaCasilla(i,j);
-						switch(toque){
-						case -1:	//AGUA
-							guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.cyan);
-							break;
-						case -2:	//TOCADO
-							guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.yellow);
-							break;
-						default:	//HUNDIDO
-							quedan--;
-							guiTablero.pintaBarcoHundido(aux.getBarco(toque));
-							break;
-						} //end switch
-						disparos++;
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+					toque = aux.pruebaCasilla(i,j);
+					switch(toque){
+					case -1:	//AGUA
+						guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.cyan);
+						break;
+					case -2:	//TOCADO
+						guiTablero.pintaBoton(guiTablero.buttons[i][j],Color.yellow);
+						break;
+					default:	//HUNDIDO
+						quedan--;
+						guiTablero.pintaBarcoHundido(aux.getBarco(toque));
+						break;
+					} //end switch
+					disparos++;
 				}
 				if(quedan==0)
 					guiTablero.cambiaEstado("GAME OVER en " + disparos + " disparos");
